@@ -45,7 +45,42 @@ const TOGGLE_TODO = 'TOGGLE_TODO'
 const ADD_GOAL = 'ADD_GOAL'
 const REMOVE_GOAL = 'REMOVE_GOAL'
 
+function addTodoAction (todo) {
+  return {
+    type: ADD_TODO,
+    todo,
+  }
+}
+
+function removeTodoAction (id) {
+  return {
+    type: REMOVE_TODO,
+    id,
+  }
+}
+
+function toggleTodoAction (id) {
+  return {
+    type:TOGGLE_TODO,
+    id,
+  }
+}
+
+function addGoalAction (goal) {
+  return {
+    type:ADD_GOAL,
+    goal,
+  }
+}
+
+function removeGoalAction (id) {
+  return {
+    type: REMOVE_GOAL,
+    id,
+  }
+}
 // Reducer function
+    //return new state based on action
 function todos (state = [], action) {
   switch(action.type) {
     case ADD_TODO :
@@ -91,60 +126,48 @@ const unsubuscribe = store.subscribe(() => {
 console.log('The new STATE is ', store.getState())
 })
 
-store.dispatch({
-  type: 'ADD_TODO',
+store.dispatch(addTodoAction({
+    id: 1,
+    name: 'Wash the car',
+    complete: false,
+  })
+
+store.dispatch(addTodoAction({
   todo: {
     id: 0,
     name: 'Walk the dog',
     complete: false,
   }
-})
+}))
 
-store.dispatch({
-  type: 'ADD_TODO',
-  todo: {
-    id: 1,
-    name: 'Wash the car',
-    complete: false,
-  }
-})
-
-store.dispatch({
-  type: 'ADD_TODO',
+store.dispatch(addTodoAction({
   todo: {
     id: 2,
     name: 'Go to the gym',
     complete: true,
   }
-})
+}))
 
-store.dispatch({
-  type: 'REMOVE_TODO',
-  id: 1
-})
+store.dispatch(removeTodoAction(1))
+
+store.dispatch(toggleTodoAction(0))
+
+store.dispatch(addGoalAction({goal: {
+    id: 0,
+    name: 'Learn Redux'
+  }))
+
+store.dispatch(addGoalAction(type: 'ADD_GOAL',
+  goal: {
+    id: 1,
+    name: 'Lose 20 pounds'
+  }))
+
 
 store.dispatch({
   type: 'TOGGLE_TODO',
   id: 0
 })
 
-store.dispatch({
-  type: 'ADD_GOAL',
-  goal: {
-    id: 0,
-    name: 'Learn Redux'
-  }
-})
+store.dispatch(removeTodoAction(0))
 
-store.dispatch({
-  type: 'ADD_GOAL',
-  goal: {
-    id: 1,
-    name: 'Lose 20 pounds'
-  }
-})
-
-store.dispatch({
-  type: 'REMOVE_GOAL',
-  id: 0
-})
