@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Todo's and goals</title>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js'></script>
 </head>
 <body>
   <div>
@@ -26,44 +27,7 @@
      function generateId () {
       return Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
     }
-    //Library code
-function createStore (reducer) {
-  // The store should have four parts
-  // 1. The state
-  // 2. Get the state. (getState)
-  // 3. Listen to changes on the state. (subscribe)
-  // 4. Update the state (dispatch)
 
-  let state
-  let listeners = []
-
-  const getState = () => state
-
-  const subscribe = (listener) => {
-    listeners.push(listener)
-    return () => {
-      listeners = listeners.filter((l) => l !== listener)
-    }
-  }
-
-  const dispatch = (action) => {
-    state = reducer(state, action)
-    listeners.forEach((listener) => listener())
-  }
-
-  return {
-    getState,
-    subscribe,
-    dispatch,
-  }
-}
-
-/*
-Characteristics of a Pure Function
-1) They always return the same result if the same arguments are passed in.
-2) They depend only on the arguments passed into them.
-3) Never produce any side effects.
-*/
 
 //App code
 
@@ -107,6 +71,24 @@ function removeGoalAction (id) {
     id,
   }
 }
+
+  function checkAndDispatch (store, action) {
+    if (
+        action.type === ADD_TODO &&
+        action.todo.name.toLowerCase().indexOf('bitcoin') !== -1
+      ) {
+      return alert("Nope. that's a bad idea.")
+    }
+     if (
+        action.type === ADD_GOAL &&
+        action.goal.name.toLowerCase().indexOf('bitcoin') !== -1
+      ) {
+      return alert("Nope. that's a bad idea.")
+    }
+
+    return store.dispatch(action)
+  }
+
 // Reducer function
     //return new state based on action
 function todos (state = [], action) {
@@ -127,6 +109,7 @@ function todos (state = [], action) {
   }
 }
 
+
 //reducer function
 function goals (state = [], action) {
   switch(action.type) {
@@ -139,16 +122,11 @@ function goals (state = [], action) {
   }
 }
 
-//create an object with our different state arrays
-function app (state = {}, action) {
-  return {
-    todos:todos(state.todos, action),
-    goals:goals(state.goals, action)
-  }
-}
-
-
-const store = createStore(app)
+  //create an object with our different state arrays
+  const store = Redux.createStore(Redux.combineReducers({
+    todos,
+    goals,
+  }))
 
 store.subscribe(() => {
   const {goals, todos} = store.getState()
@@ -160,54 +138,6 @@ store.subscribe(() => {
   goals.forEach(addGoalToDOM)
   todos.forEach(addTodoToDOM)
 })
-
-
-// store.dispatch(addTodoAction({
-//     id: 1,
-//     name: 'Wash the car',
-//     complete: false,
-//   }))
-
-// store.dispatch(addTodoAction({
-//   todo: {
-//     id: 0,
-//     name: 'Walk the dog',
-//     complete: false,
-//   }
-// }))
-
-// store.dispatch(addTodoAction({
-//   todo: {
-//     id: 2,
-//     name: 'Go to the gym',
-//     complete: true,
-//   }
-// }))
-
-// store.dispatch(removeTodoAction(1))
-
-// store.dispatch(toggleTodoAction(0))
-
-// store.dispatch(addGoalAction({
-//   goal: {
-//     id: 0,
-//     name: 'Learn Redux'
-//   }}))
-
-// store.dispatch(addGoalAction({
-//   goal: {
-//     id: 1,
-//     name: 'Lose 20 pounds'
-//   }
-//   }))
-
-
-// store.dispatch({
-//   type: 'TOGGLE_TODO',
-//   id: 0
-// })
-
-// store.dispatch(removeTodoAction(0))
 
   //DOM code
 
@@ -224,7 +154,7 @@ store.subscribe(() => {
   const text = document.createTextNode(todo.name)
 
   const removeBtn = createRemoveButton(() => {
-    store.dispatch(removeTodoAction(todo.id))
+    checkAndDispatch(store, removeTodoAction(todo.id))
   })
 
   node.appendChild(text)
@@ -233,7 +163,7 @@ store.subscribe(() => {
   node.style.textDecoration = todo.complete ? 'line-through' : 'none'
   node.addEventListener('click', () => {
     // Todo...
-    store.dispatch(toggleTodoAction(todo.id))
+    checkAndDispatch(store, toggleTodoAction(todo.id))
   });
 
   document.getElementById('todos')
@@ -245,7 +175,7 @@ function addGoalToDOM (goal) {
   const text = document.createTextNode(goal.name)
 
   const removeBtn = createRemoveButton(() => {
-    store.dispatch(removeGoalAction(goal.id))
+    checkAndDispatch(store, removeGoalAction(goal.id))
   })
 
   node.appendChild(text)
@@ -261,7 +191,7 @@ function addGoalToDOM (goal) {
     const name = input.value
     input.value = ''
 
-    store.dispatch(addTodoAction({
+    checkAndDispatch(store, addTodoAction({
     id: generateId(),
     name,
     complete: false,
@@ -271,7 +201,7 @@ function addGoalToDOM (goal) {
     const input = document.getElementById('goal')
     const name = input.value
     input.value = ''
-    store.dispatch(addGoalAction({
+    checkAndDispatch(store, addGoalAction({
     id: generateId(),
     name: name
   }))
