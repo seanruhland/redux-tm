@@ -88,6 +88,15 @@ const checker = (store) => (next) => (action) => {
       return next(action)
     }
 
+const logger = (store) => (next) => (action) => {
+  console.group(action.type)
+  console.log('The action: ', action)
+  const result = next(action)
+  console.log('the new sate: ', store.getState())
+  console.groupEnd()
+  return result
+}
+
 // Reducer function
     //return new state based on action
 function todos (state = [], action) {
@@ -125,7 +134,8 @@ function goals (state = [], action) {
   const store = Redux.createStore(Redux.combineReducers({
     todos,
     goals,
-  }), Redux.applyMiddleware(checker))
+    //trigger our logger middleware
+  }), Redux.applyMiddleware(checker, logger))
 
 store.subscribe(() => {
   const {goals, todos} = store.getState()
