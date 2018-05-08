@@ -8,6 +8,7 @@
   <script src='https://unpkg.com/react-dom@16.3.0-alpha.1/umd/react-dom.development.js'></script>
   <script src='https://unpkg.com/babel-standalone@6.15.0/babel.min.js'></script>
   <script src='https://tylermcginnis.com/goals-todos-api/index.js'></script>
+  <script src='https://unpkg.com/redux-thunk@2.2.0/dist/redux-thunk.min.js'></script>
 </head>
 <body>
 
@@ -136,6 +137,20 @@
     }
   }
 
+  function handleInitialData () {
+    return (dispatch) => {
+          dispatch(receiveDataAction(todos,goals))
+    return  Promise.all([
+        API.fetchTodos(),
+        API.fetchGoals(),
+        ]).then(([ todos, goals]) => {
+          dispatch(receiveDataAction(todos,goals))
+        })
+
+
+    }
+  }
+
 
 
 
@@ -165,13 +180,6 @@
     console.log('the new sate: ', store.getState())
     console.groupEnd()
     return result
-  }
-
-  const thunk = (store) => (next) => (action) => {
-    if (typeof action === 'function') {
-      return action(store.dispatch)
-    }
-    return next(action)
   }
 
   // Reducer function
@@ -226,7 +234,7 @@
     goals,
     loading,
     //trigger our logger middleware
-  }), Redux.applyMiddleware(checker, logger, thunk))
+  }), Redux.applyMiddleware( ReduxThunk.default, checker, logger))
 
 
 
@@ -267,7 +275,6 @@
 
     toggleItem = (id) => {
       this.props.store.dispatch(handleToggle(id))
-
     }
 
     render() {
@@ -326,13 +333,7 @@ class App extends React.Component {
   componentDidMount () {
     const {store} = this.props
 
-    Promise.all([
-      API.fetchTodos(),
-      API.fetchGoals(),
-      ]).then(([ todos, goals]) => {
-        store.dispatch(receiveDataAction(todos,goals))
-      })
-
+    store.dispatch(handleInitialData())
     //cause a re-render with forceUpdate
     store.subscribe(() => this.forceUpdate())
   }
