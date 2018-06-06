@@ -7,6 +7,6 @@ import { loadingBarReducer } from 'react-redux-loading'
 export default combineReducers({
   authedUser,
   users,
-  polls,
+  tweets,
   loadingBar: loadingBarReducer
 })
