@@ -261,9 +261,11 @@
             () => this.input.value = ''
           ))
         }
+
         removeItem = (goal) => {
           this.props.dispatch(handleDeleteGoal(goal))
         }
+
         render() {
           return (
             <div>
@@ -282,9 +284,11 @@
           )
         }
       }
+
       const ConnectedGoals = ReactRedux.connect((state) => ({
         goals: state.goals
       }))(Goals)
+
       class App extends React.Component {
         componentDidMount () {
           const { dispatch } = this.props
@@ -303,9 +307,11 @@
           )
         }
       }
+
       const ConnectedApp = ReactRedux.connect((state) => ({
         loading: state.loading
       }))(App)
+
       ReactDOM.render(
         <ReactRedux.Provider store={store}>
           <ConnectedApp />
